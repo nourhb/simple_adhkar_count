@@ -1,11 +1,717 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Adhkar Count</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الرقية الذكية</title>
+
+<style>
+:root{
+  --bg:#f6f3ed;
+  --card:#fff;
+  --ink:#252525;
+  --muted:#777;
+  --accent:#315c4a;
+  --accent2:#d9b66f;
+  --line:#e8e1d5;
+  --danger:#9b4141;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(180deg,#f6f3ed,#eee9df);
+  color:var(--ink);
+  font-family:Tahoma,"Noto Naskh Arabic",Arial,sans-serif;
+}
+
+.wrap{
+  max-width:760px;
+  margin:auto;
+  padding:22px 15px 50px;
+}
+
+header{
+  text-align:center;
+  padding:18px 8px 12px;
+}
+
+h1{
+  margin:0 0 7px;
+  font-size:31px;
+  color:var(--accent);
+}
+
+header p{
+  margin:0;
+  color:var(--muted);
+}
+
+.progress{
+  position:sticky;
+  top:0;
+  z-index:4;
+  background:#f6f3edf2;
+  backdrop-filter:blur(8px);
+  padding:10px 0 12px;
+}
+
+.bar{
+  height:9px;
+  background:#ddd7cb;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.fill{
+  height:100%;
+  width:0;
+  background:var(--accent);
+  transition:.25s;
+}
+
+.progressText{
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px;
+  margin:16px 0;
+  box-shadow:0 7px 25px #594d3b0d;
+}
+
+.card h2{
+  margin:0 0 4px;
+  color:var(--accent);
+  font-size:22px;
+}
+
+.sub{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:14px;
+}
+
+.ayah{
+  font-size:25px;
+  line-height:2.05;
+  text-align:center;
+  background:#fbfaf7;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:17px 13px;
+  margin-bottom:15px;
+}
+
+.counter{
+  text-align:center;
+}
+
+.count{
+  font-size:42px;
+  font-weight:700;
+  color:var(--accent);
+  line-height:1;
+}
+
+.target{
+  font-size:14px;
+  color:var(--muted);
+  margin:5px 0 13px;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:13px 17px;
+  font:inherit;
+  cursor:pointer;
+}
+
+.primary{
+  background:var(--accent);
+  color:#fff;
+  min-width:180px;
+  font-size:18px;
+}
+
+.primary:active{
+  transform:scale(.98);
+}
+
+.secondary{
+  background:#eee9df;
+  color:var(--ink);
+}
+
+.danger{
+  background:#f4dddd;
+  color:var(--danger);
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.dots{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:5px;
+  margin-top:16px;
+}
+
+.dot{
+  height:9px;
+  border-radius:99px;
+  background:#ded8cc;
+}
+
+.dot.done{
+  background:var(--accent);
+}
+
+.doneMsg{
+  display:none;
+  text-align:center;
+  color:var(--accent);
+  font-weight:700;
+  margin-top:12px;
+}
+
+.dua{
+  font-size:20px;
+  line-height:2;
+  background:#fbfaf7;
+  border-right:4px solid var(--accent2);
+  padding:14px 16px;
+  border-radius:12px;
+}
+
+.tip{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:25px;
+}
+</style>
 </head>
+
 <body>
-    <h1>Welcome to Simple Adhkar Count</h1>
+
+<div class="wrap">
+
+<header>
+  <h1>الرقية الذكية</h1>
+  <p>عداد بسيط ومنظم يساعدك على إتمام الأعداد دون التلخبط</p>
+</header>
+
+<div class="progress">
+  <div class="bar">
+    <div class="fill" id="globalFill"></div>
+  </div>
+
+  <div class="progressText" id="globalText">
+    0 من 352
+  </div>
+</div>
+
+
+<!-- الفاتحة -->
+
+<section class="card">
+
+<h2>سورة الفاتحة</h2>
+
+<div class="sub">
+المطلوب: 11 مرة
+</div>
+
+<div class="ayah">
+
+بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ<br>
+
+الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ<br>
+
+الرَّحْمَٰنِ الرَّحِيمِ<br>
+
+مَالِكِ يَوْمِ الدِّينِ<br>
+
+إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ<br>
+
+اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ<br>
+
+صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ
+غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ
+وَلَا الضَّالِّينَ
+
+</div>
+
+<div class="counter">
+
+<div class="count" id="fatihaCount">
+0
+</div>
+
+<div class="target">
+من 11
+</div>
+
+<button class="primary"
+onclick="add('fatiha',11)">
+أتممت الفاتحة
+</button>
+
+<div class="row">
+
+<button class="secondary"
+onclick="undo('fatiha')">
+تراجع
+</button>
+
+<button class="danger"
+onclick="resetOne('fatiha')">
+إعادة
+</button>
+
+</div>
+
+<div class="dots" id="fatihaDots"></div>
+
+<div class="doneMsg" id="fatihaDone">
+اكتمل العدد 11
+</div>
+
+</div>
+
+</section>
+
+
+<!-- الزلزلة -->
+
+<section class="card">
+
+<h2>سورة الزلزلة</h2>
+
+<div class="sub">
+المطلوب: 41 مرة
+</div>
+
+<div class="ayah">
+
+بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ<br>
+
+إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا<br>
+
+وَأَخْرَجَتِ الْأَرْضُ أَثْقَالَهَا<br>
+
+وَقَالَ الْإِنسَانُ مَا لَهَا<br>
+
+يَوْمَئِذٍ تُحَدِّثُ أَخْبَارَهَا<br>
+
+بِأَنَّ رَبَّكَ أَوْحَىٰ لَهَا<br>
+
+يَوْمَئِذٍ يَصْدُرُ النَّاسُ أَشْتَاتًا
+لِّيُرَوْا أَعْمَالَهُمْ<br>
+
+فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ<br>
+
+وَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ شَرًّا يَرَهُ
+
+</div>
+
+<div class="counter">
+
+<div class="count" id="zalzalaCount">
+0
+</div>
+
+<div class="target">
+من 41
+</div>
+
+<button class="primary"
+onclick="add('zalzala',41)">
+أتممت الزلزلة
+</button>
+
+<div class="row">
+
+<button class="secondary"
+onclick="undo('zalzala')">
+تراجع
+</button>
+
+<button class="danger"
+onclick="resetOne('zalzala')">
+إعادة
+</button>
+
+</div>
+
+<div class="dots" id="zalzalaDots"></div>
+
+<div class="doneMsg" id="zalzalaDone">
+اكتمل العدد 41
+</div>
+
+</div>
+
+</section>
+
+
+<!-- الدعاء -->
+
+<section class="card">
+
+<h2>الدعاء</h2>
+
+<div class="sub">
+ما تيسّر من الدعاء
+</div>
+
+<div class="dua">
+
+اللهم إني أسألك العفو والعافية،
+وأسألك أن تحفظني من كل سوء وشر،
+وأن تشفيني وتعافيني،
+وتشرح صدري،
+وتيسّر أمري،
+وتصرف عني كل أذى،
+وتكتب لي الخير حيث كان،
+إنك على كل شيء قدير.
+
+</div>
+
+<p class="tip">
+يمكنك الدعاء بما تريد وبما في قلبك، وليس هذا النص شرطًا.
+</p>
+
+</section>
+
+
+<!-- الاستغفار -->
+
+<section class="card">
+
+<h2>الاستغفار</h2>
+
+<div class="sub">
+أستغفر الله وأتوب إليه — 100 مرة
+</div>
+
+<div class="counter">
+
+<div class="count" id="istighfarCount">
+0
+</div>
+
+<div class="target">
+من 100
+</div>
+
+<button class="primary"
+onclick="add('istighfar',100)">
++1 استغفار
+</button>
+
+<div class="row">
+
+<button class="secondary"
+onclick="undo('istighfar')">
+تراجع
+</button>
+
+<button class="danger"
+onclick="resetOne('istighfar')">
+إعادة
+</button>
+
+</div>
+
+<div class="dots" id="istighfarDots"></div>
+
+<div class="doneMsg" id="istighfarDone">
+اكتمل العدد 100
+</div>
+
+</div>
+
+</section>
+
+
+<!-- الصلاة على النبي -->
+
+<section class="card">
+
+<h2>الصلاة على النبي</h2>
+
+<div class="sub">
+اللهم صل وسلم وبارك على سيدنا محمد — 100 مرة
+</div>
+
+<div class="counter">
+
+<div class="count" id="salatCount">
+0
+</div>
+
+<div class="target">
+من 100
+</div>
+
+<button class="primary"
+onclick="add('salat',100)">
++1 صلاة
+</button>
+
+<div class="row">
+
+<button class="secondary"
+onclick="undo('salat')">
+تراجع
+</button>
+
+<button class="danger"
+onclick="resetOne('salat')">
+إعادة
+</button>
+
+</div>
+
+<div class="dots" id="salatDots"></div>
+
+<div class="doneMsg" id="salatDone">
+اكتمل العدد 100
+</div>
+
+</div>
+
+</section>
+
+
+<!-- التحكم -->
+
+<section class="card">
+
+<h2>التحكم</h2>
+
+<p class="tip">
+التقدم يُحفظ تلقائيًا على هذا الجهاز،
+حتى لو أغلقت الصفحة.
+يمكنك إعادة البداية في أي وقت.
+</p>
+
+<div class="row">
+
+<button class="danger"
+onclick="resetAll()">
+إعادة الرقية من البداية
+</button>
+
+</div>
+
+</section>
+
+
+<footer>
+أداة تنظيم للعدّ فقط، وليست فتوى أو بديلًا عن سؤال أهل العلم.
+</footer>
+
+</div>
+
+
+<script>
+
+const targets = {
+  fatiha:11,
+  zalzala:41,
+  istighfar:100,
+  salat:100
+};
+
+const total =
+  Object.values(targets).reduce((a,b)=>a+b,0);
+
+
+let state =
+  JSON.parse(
+    localStorage.getItem('rokiaSmart') || '{}'
+  );
+
+
+for(const key in targets){
+
+  state[key] =
+    Math.min(
+      Number(state[key] || 0),
+      targets[key]
+    );
+
+}
+
+
+function save(){
+
+  localStorage.setItem(
+    'rokiaSmart',
+    JSON.stringify(state)
+  );
+
+  render();
+
+}
+
+
+function add(key,target){
+
+  if(state[key] < target){
+
+    state[key]++;
+
+    save();
+
+  }
+
+}
+
+
+function undo(key){
+
+  if(state[key] > 0){
+
+    state[key]--;
+
+    save();
+
+  }
+
+}
+
+
+function resetOne(key){
+
+  state[key] = 0;
+
+  save();
+
+}
+
+
+function resetAll(){
+
+  if(
+    confirm(
+      'هل تريد إعادة جميع الأعداد إلى الصفر؟'
+    )
+  ){
+
+    for(const key in targets){
+
+      state[key] = 0;
+
+    }
+
+    save();
+
+  }
+
+}
+
+
+function render(){
+
+  let done = 0;
+
+
+  for(const key in targets){
+
+    const count = state[key];
+
+    const target = targets[key];
+
+    done += count;
+
+
+    document.getElementById(
+      key + 'Count'
+    ).textContent = count;
+
+
+    const dots =
+      document.getElementById(
+        key + 'Dots'
+      );
+
+
+    dots.innerHTML = '';
+
+
+    for(
+      let i = 0;
+      i < target;
+      i++
+    ){
+
+      const dot =
+        document.createElement('span');
+
+
+      dot.className =
+        'dot' +
+        (i < count ? ' done' : '');
+
+
+      dots.appendChild(dot);
+
+    }
+
+
+    document.getElementById(
+      key + 'Done'
+    ).style.display =
+      count === target
+        ? 'block'
+        : 'none';
+
+  }
+
+
+  document.getElementById(
+    'globalText'
+  ).textContent =
+    done + ' من ' + total;
+
+
+  document.getElementById(
+    'globalFill'
+  ).style.width =
+    (done / total * 100) + '%';
+
+}
+
+
+render();
+
+</script>
+
 </body>
 </html>
